@@ -1,0 +1,35 @@
+package com.cutiekyle.zhportremake
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cutiekyle.zhportremake.ui.MainScreen
+import com.cutiekyle.zhportremake.ui.MainViewModel
+import com.cutiekyle.zhportremake.ui.theme.ZHTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            ZHTheme {
+                val vm: MainViewModel = viewModel(
+                    factory = MainViewModel.Factory(applicationContext)
+                )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color     = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen(vm)
+                }
+            }
+        }
+    }
+}

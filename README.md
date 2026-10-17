@@ -1,33 +1,35 @@
-# Generals ZH Launcher — Android
+# GeneralsZH Port Remake by cutiekyle._.
 
-Winlator-style mod compatibility launcher for the [GeneralsZH Android Port](https://github.com/MYSOREZ/GeneralsZH-Android-Port).
+Native Android mod launcher for the [GeneralsZH Android Port](https://github.com/MYSOREZ/GeneralsZH-Android-Port).
+
+Built with **Kotlin + Jetpack Compose**. Full native app — no WebView, no HTML.
+
+## 📥 Download APK
+
+**[Go to Releases →](../../releases/latest)**
+
+APK is auto-built by GitHub Actions on every push. Download `app-debug.apk`, enable **Install unknown apps** on Android, tap and install.
 
 ## Features
-- **Mods tab** — add/edit/delete mods, toggle, drag-to-reorder priority, compatibility matrix (conflict / dependency detection), known-mod search database
-- **Graphics tab** — renderer picker (Vulkan/OpenGL ES 3/2/Turnip), resolution, scaling, upscale quality, texture/shadow/particle/lighting/AF/MSAA toggles
-- **Performance tab** — CPU governor, thread count, FPS cap, VSync, low-latency, heap limit, texture streaming, benchmark sim
-- **Controls tab** — all touch gesture toggles, pan/zoom/dead-zone/long-press sensitivity sliders, HUD opacity + size
-- **Network tab** — GeneralsOnline server, STUN/TURN, ICE, multicast lock, bandwidth cap
-- **Profiles tab** — named setting profiles with emoji icons
-- **Logs tab** — live launcher log with level filter
-- Import/Export JSON config
-- PWA — also installable from Chrome on Android without an APK
 
-## Download APK
-Go to the [Releases](../../releases) tab — APK is auto-built on every push by GitHub Actions.
+| Tab | What it does |
+|---|---|
+| **Launch** | Mod load order resolver, launch command builder, game dir config |
+| **Mods** | Add/edit/delete mods, toggles, drag priority, compat matrix (conflict/dep detection) |
+| **Graphics** | Renderer (Vulkan/OpenGL ES/Turnip), resolution, texture, shadow, particles, MSAA |
+| **Performance** | CPU governor, thread count, FPS cap, VSync, low-latency, heap limit |
+| **Controls** | Touch gesture toggles, pan/zoom/long-press/dead-zone sensitivity sliders |
+| **Network** | GeneralsOnline server, STUN/TURN/ICE, multicast lock, bandwidth |
+| **Profiles** | Quick-apply named configurations |
+| **Logs** | Live launcher log with level filter |
 
-## Build it yourself
+## Build yourself
+
 ```bash
-git clone https://github.com/cutiekyle640-commits/generalszh-android-launcher
-cd generalszh-android-launcher
+git clone https://github.com/cutiekyle640-commits/generalszh-port-remake
+cd generalszh-port-remake
 ./gradlew assembleDebug
-# APK at: app/build/outputs/apk/debug/app-debug.apk
+# APK: app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Install
-1. Enable **Install unknown apps** on your Android device
-2. Download the APK from [Releases](../../releases)
-3. Tap the APK file and install
-
-## PWA (no APK needed)
-Host the `index.html` + `sw.js` anywhere, open in Chrome on Android, tap **Add to Home Screen**.
+Requires JDK 17 + Android SDK.

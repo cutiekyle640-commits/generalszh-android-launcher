@@ -1,4 +1,4 @@
-name: Build ZH Launcher APK
+name: Build ZH Port Remake APK
 
 on:
   push:
@@ -17,33 +17,55 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Set up Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Grant execute permission for gradlew
+        run: |
+          curl -sL https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/gradle
+          export PATH="/tmp/gradle/gradle-8.7/bin:$PATH"
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          export PATH="/tmp/gradle/gradle-8.7/bin:$PATH"
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: zh-launcher-debug
+          name: ZHPortRemake-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      - name: Create GitHub Release
-        if: github.ref == 'refs/heads/main'
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.4.${{ github.run_number }}
-          name: ZH Launcher v1.4.${{ github.run_number }}
+          tag_name: v1.0.${{ github.run_number }}
+          name: "ZH Port Remake by cutiekyle._. — v1.0.${{ github.run_number }}"
           files: app/build/outputs/apk/debug/app-debug.apk
-          generate_release_notes: false
           body: |
-            Auto-built APK from GitHub Actions.
-            Install with "Unknown sources" enabled on Android.
+            ## GeneralsZH Port Remake by cutiekyle._.
+
+            Native Android app — Kotlin + Jetpack Compose. No WebView.
+
+            ### Install
+            1. Download `app-debug.apk` below
+            2. Enable **Install unknown apps** on your Android device  
+            3. Tap the APK and install
+
+            ### Tabs included
+            - **Launch** — mod load order, launch command generator, game dir config
+            - **Mods** — add/edit/delete mods, toggle, conflict + dependency matrix
+            - **Graphics** — renderer, resolution, texture/shadow/particle/MSAA controls
+            - **Performance** — CPU governor, threads, FPS cap, VSync, heap limit
+            - **Controls** — touch gesture toggles, pan/zoom/long-press sensitivity
+            - **Network** — GeneralsOnline server, STUN/TURN, multicast lock
+            - **Profiles** — quick-apply saved configurations
+            - **Logs** — live launcher log with level filter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
