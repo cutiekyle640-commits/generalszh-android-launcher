@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,30 +20,33 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Grant execute permission for gradlew
+      # Accept Android SDK licenses using the SDK already on ubuntu-latest
+      - name: Accept Android SDK licenses
         run: |
-          curl -sL https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/gradle.zip
-          unzip -q /tmp/gradle.zip -d /tmp/gradle
-          export PATH="/tmp/gradle/gradle-8.7/bin:$PATH"
-          gradle wrapper --gradle-version 8.7
+          yes | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      # Bootstrap gradlew from scratch — no binary needed in repo
+      - name: Bootstrap Gradle wrapper
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/
+          /tmp/gradle-8.7/bin/gradle wrapper --gradle-version=8.7 --distribution-type=bin
           chmod +x gradlew
 
       - name: Build debug APK
-        run: |
-          export PATH="/tmp/gradle/gradle-8.7/bin:$PATH"
-          ./gradlew assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --no-daemon
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ZHPortRemake-debug
+          name: ZHPortRemake-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      - name: Create Release
+      - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
@@ -50,22 +54,21 @@ jobs:
           files: app/build/outputs/apk/debug/app-debug.apk
           body: |
             ## GeneralsZH Port Remake by cutiekyle._.
+            Native Android app built with Kotlin + Jetpack Compose.
 
-            Native Android app — Kotlin + Jetpack Compose. No WebView.
+            ### How to install
+            1. Download **app-debug.apk** below
+            2. On your Android: Settings → Security → enable **Install unknown apps**
+            3. Open the APK file and tap Install
 
-            ### Install
-            1. Download `app-debug.apk` below
-            2. Enable **Install unknown apps** on your Android device  
-            3. Tap the APK and install
-
-            ### Tabs included
-            - **Launch** — mod load order, launch command generator, game dir config
-            - **Mods** — add/edit/delete mods, toggle, conflict + dependency matrix
-            - **Graphics** — renderer, resolution, texture/shadow/particle/MSAA controls
-            - **Performance** — CPU governor, threads, FPS cap, VSync, heap limit
-            - **Controls** — touch gesture toggles, pan/zoom/long-press sensitivity
-            - **Network** — GeneralsOnline server, STUN/TURN, multicast lock
-            - **Profiles** — quick-apply saved configurations
-            - **Logs** — live launcher log with level filter
+            ### What's inside
+            - **Launch** — mod load order, launch command generator
+            - **Mods** — add/edit/delete, toggles, compatibility matrix
+            - **Graphics** — Vulkan/OpenGL ES renderer, resolution, quality
+            - **Performance** — CPU governor, FPS cap, heap limit, VSync
+            - **Controls** — touch gesture toggles, sensitivity sliders
+            - **Network** — GeneralsOnline, STUN/TURN, bandwidth
+            - **Profiles** — quick-apply saved configs
+            - **Logs** — live log with level filter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
